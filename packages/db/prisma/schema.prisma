@@ -1,0 +1,63 @@
+// Prisma schema for the logistics analytics dataset.
+//
+// The source data is a single flat CSV (one row per order), so the schema is a
+// single `Order` model that mirrors it faithfully. This keeps aggregation logic
+// simple and auditable — a deliberate choice over a normalized schema given the
+// read-only, analytics-only nature of the app.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  delivered
+  delayed
+  in_transit
+  exception
+  canceled
+}
+
+model Order {
+  // order_id is unique per row in the dataset, so it doubles as the primary key.
+  orderId String @id @map("order_id")
+
+  clientId String @map("client_id")
+
+  orderDate    DateTime  @map("order_date") @db.Date
+  deliveryDate DateTime? @map("delivery_date") @db.Date
+  // delivery_date - order_date in days; precomputed at seed time so average
+  // delivery time is a plain column aggregate (no raw date arithmetic in SQL).
+  // Null when the order has not been delivered yet (in_transit / canceled).
+  deliveryDays Int? @map("delivery_days")
+
+  carrier         String
+  originCity      String      @map("origin_city")
+  destinationCity String      @map("destination_city")
+  status          OrderStatus
+  sku             String
+  productCategory String      @map("product_category")
+
+  quantity      Int
+  unitPriceUsd  Decimal @map("unit_price_usd") @db.Decimal(10, 2)
+  orderValueUsd Decimal @map("order_value_usd") @db.Decimal(12, 2)
+
+  isPromo          Boolean @map("is_promo")
+  promoDiscountPct Int     @map("promo_discount_pct")
+
+  region    String
+  warehouse String
+
+  // Indexes on the columns the analytics queries filter and group by.
+  @@index([orderDate])
+  @@index([carrier])
+  @@index([status])
+  @@index([sku])
+  @@index([productCategory])
+  @@index([region])
+  @@map("orders")
+}
