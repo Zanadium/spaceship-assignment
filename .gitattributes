@@ -1,0 +1,9 @@
+# Normalize line endings to LF across platforms (Windows dev, Linux/Docker deploy)
+* text=auto eol=lf
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.pdf binary
+*.docx binary
+*.xlsx binary
