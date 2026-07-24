@@ -36,7 +36,10 @@ export class MockRouter implements QuestionRouter {
   }
 
   private buildForecast(q: string, meta: FilterMeta): RouterOutput {
-    const sku = meta.skus.find((s) => q.includes(s.toLowerCase()));
+    // Match a SKU token directly (e.g. "paper-0197") rather than scanning the
+    // capped SKU list, so any valid SKU is recognized.
+    const skuMatch = q.match(/\b([a-z]+-\d+)\b/);
+    const sku = skuMatch ? (skuMatch[1] as string).toUpperCase() : undefined;
     const category = sku
       ? undefined
       : meta.productCategories.find((c) => q.includes(c.toLowerCase()));
@@ -91,8 +94,9 @@ export class MockRouter implements QuestionRouter {
     if (/on[- ]?time|on time/.test(q)) return "on_time_rate";
     if (/average delivery|avg delivery|delivery time|how long/.test(q))
       return "avg_delivery_days";
-    if (/\bdelivered\b/.test(q)) return "delivered_count";
+    // Check late/delayed before "delivered" so "delivered late" reads as delayed.
     if (/\bdelayed\b|\blate\b/.test(q)) return "delayed_count";
+    if (/\bdelivered\b/.test(q)) return "delivered_count";
     if (/revenue|order value|sales|gmv|\bvalue\b/.test(q))
       return "total_order_value";
     if (/quantity|units sold|total units/.test(q)) return "total_quantity";
