@@ -156,7 +156,8 @@ Without an `OPENAI_API_KEY` the app still works fully — the deterministic rout
 | `APP_USERNAME` / `APP_PASSWORD` | api | The single shared login credential |
 | `PORT` | api | API port (default 3000) |
 | `FE_ORIGIN` | api | Comma-separated allowed CORS origins |
-| `VITE_API_URL` | web | Base URL of the API (build-time) |
+| `VITE_API_URL` | web | Base URL of the API **including** the `/api` suffix, e.g. `http://localhost:3000/api` (build-time) |
+| `RUN_MIGRATIONS` | api | Optional. `true` (default) runs `prisma migrate deploy` on container start |
 | `VITE_DEMO_USERNAME` / `VITE_DEMO_PASSWORD` | web | Optional login prefill for reviewers |
 
 Secrets live only in `.env` (gitignored) or in the host's environment — never in the repository.
@@ -171,12 +172,12 @@ pnpm --filter @spaceship/api test
 
 ## Deployment (Coolify)
 
-Two resources, each built from its Dockerfile with the **monorepo root** as build context:
+Two resources, each built from its Dockerfile with **Base Directory = `/`** (the monorepo root is the build context):
 
-- **API** — `apps/api/Dockerfile`. Inject `DATABASE_URL`, `OPENAI_API_KEY`, `JWT_SECRET`, `APP_USERNAME`, `APP_PASSWORD`, `FE_ORIGIN` (the web URL) as environment variables. Run `pnpm db:migrate` once against the database (the migration and seed are already applied to the shared instance).
-- **Web** — `apps/web/Dockerfile`, served by nginx. Pass `VITE_API_URL` (the API URL), `VITE_DEMO_USERNAME`, `VITE_DEMO_PASSWORD` as **build args** (Vite bakes them at build time).
+- **API** — Dockerfile Location `/apps/api/Dockerfile`. Inject `DATABASE_URL`, `OPENAI_API_KEY`, `JWT_SECRET`, `APP_USERNAME`, `APP_PASSWORD`, and `FE_ORIGIN` (the web URL) as environment variables. The container's entrypoint runs `prisma migrate deploy` on start (idempotent; disable with `RUN_MIGRATIONS=false`). Exposes port `3000`.
+- **Web** — Dockerfile Location `/apps/web/Dockerfile`, served by nginx on port `80`. Pass `VITE_API_URL` (the API URL **with `/api`**, e.g. `https://api.your-domain.com/api`), `VITE_DEMO_USERNAME`, and `VITE_DEMO_PASSWORD` as **build args** — Vite bakes them into the static bundle at build time.
 
-No secrets are committed; all are set in Coolify.
+The data was seeded once against the shared Postgres instance, so no seeding step is needed on deploy. No secrets are committed; all values are set in Coolify.
 
 ## Assumptions, simplifications & limitations
 
