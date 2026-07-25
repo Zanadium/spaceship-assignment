@@ -72,15 +72,18 @@ export function Ask() {
         </button>
       </form>
 
-      {entries.length === 0 && !busy && (
-        <div className="chips">
-          {EXAMPLES.map((ex) => (
-            <button key={ex} className="chip" onClick={() => run(ex)}>
-              {ex}
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="chips">
+        {EXAMPLES.map((ex) => (
+          <button
+            key={ex}
+            className="chip"
+            onClick={() => run(ex)}
+            disabled={busy}
+          >
+            {ex}
+          </button>
+        ))}
+      </div>
 
       {error && <div className="alert">{error}</div>}
 
