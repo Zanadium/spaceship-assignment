@@ -2,8 +2,9 @@
 
 A full-stack analytics application over a logistics dataset, combining a **traditional KPI/chart dashboard** with a **natural-language interface** that answers business questions and forecasts demand. Every answer is **computed from the data** — the AI decides *what* to compute, never *what the number is*.
 
-> **Live demo:** _<add Coolify URL after deploy>_
-> **Test credentials:** user `reviewer` / password _(shared in submission)_ — the login form is pre-filled.
+> **Live demo:** https://spaceship.teknologiasolutions.com
+> **API:** https://spaceship-api.teknologiasolutions.com/api (health: `/api/health`)
+> **Test credentials:** user `reviewer` / password `gZPiiEEzLFA0` — the login form is pre-filled, so you can just click **Sign in**.
 
 ---
 
