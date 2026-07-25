@@ -9,6 +9,7 @@ const EXAMPLES = [
   "How many orders were delivered late last month?",
   "Order volume by month",
   "Predict demand for SKU PAPER-0197 for the next 4 months",
+  "Predict the average required stock for the next 6 months",
   "Total order value by region",
 ];
 
