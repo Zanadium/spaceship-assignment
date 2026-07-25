@@ -4,7 +4,9 @@ import type {
   FilterMeta,
 } from "@spaceship/shared";
 
-const BASE = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
+// VITE_API_URL is the API base INCLUDING the /api prefix, e.g.
+// "http://localhost:3000/api" locally or "https://api.example.com/api" in prod.
+const BASE = (import.meta.env.VITE_API_URL ?? "/api").replace(/\/$/, "");
 const TOKEN_KEY = "spaceship_token";
 
 export class ApiError extends Error {
@@ -22,7 +24,7 @@ export const clearToken = (): void => localStorage.removeItem(TOKEN_KEY);
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const token = getToken();
-  const res = await fetch(`${BASE}/api${path}`, {
+  const res = await fetch(`${BASE}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
