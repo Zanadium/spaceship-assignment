@@ -1,11 +1,22 @@
+# Deps & build outputs are installed/built inside the image
 **/node_modules
 **/dist
+**/build
 **/.turbo
-**/*.tsbuildinfo
+*.tsbuildinfo
+
+# Secrets never enter the image (set them as Coolify env vars / build args)
+**/.env
+**/.env.*
+!**/.env.example
+
+# VCS / editor / logs / test noise
 .git
-.env
-.env.*
-!.env.example
+.github
+.vscode
+.idea
+**/*.log
+coverage
+
+# Not needed inside images
 requirements
-**/coverage
-*.log
